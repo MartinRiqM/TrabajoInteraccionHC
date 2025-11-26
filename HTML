@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Documentos - Universidad Mayor</title>
+    <style>
+        :root {
+            /* Colores institucionales Universidad Mayor */
+            --color-primary: #FFD700; /* Amarillo principal */
+            --color-primary-dark: #E6C200; /* Amarillo oscuro */
+            --color-primary-light: #FFF9C4; /* Amarillo claro */
+            --color-secondary: #F5F5F5; /* Gris claro */
+            --color-secondary-dark: #E0E0E0; /* Gris medio */
+            --color-secondary-darker: #9E9E9E; /* Gris oscuro */
+            --color-text: #212121; /* Texto principal */
+            --color-text-light: #757575; /* Texto secundario */
+            --color-white: #FFFFFF;
+            --color-error: #D32F2F;
+            --color-success: #388E3C;
+            
+            /* Espaciado */
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-xxl: 3rem;
+            
+            /* Bordes */
+            --border-radius: 4px;
+            --border-radius-lg: 8px;
+            
+            /* Sombras */
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            --shadow-md: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+            --shadow-lg: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+            
+            /* Tipografía */
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-md: 1rem;
+            --font-size-lg: 1.25rem;
+            --font-size-xl: 1.5rem;
+            --font-size-xxl: 2rem;
+            
+            /* Breakpoints */
+            --breakpoint-mobile: 768px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            color: var(--color-text);
+            background-color: var(--color-secondary);
+            line-height: 1.5;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background-color: var(--color-white);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: var(--spacing-lg);
+            background-color: var(--color-primary);
+            color: var(--color-text);
+            text-align: center;
+            border-bottom: 1px solid var(--color-primary-dark);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: var(--spacing-md) 0;
+        }
+
+        .nav-item {
+            padding: var(--spacing-md) var(--spacing-lg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .nav-item:hover {
+            background-color: var(--color-secondary);
+        }
+
+        .nav-item.active {
+            background-color: var(--color-primary-light);
+            border-left: 4px solid var(--color-primary);
+            font-weight: bold;
+        }
+
+        .nav-icon {
+            margin-right: var(--spacing-md);
+            width: 20px;
+            height: 20px;
+        }
+
+        .user-info {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-top: 1px solid var(--color-secondary-dark);
+            background-color: var(--color-secondary);
+            display: none;
+        }
+
+        .user-info.visible {
+            display: block;
+        }
+
+        .user-name {
+            font-weight: bold;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        /* Contenido principal */
+        .main-content {
+            flex: 1;
+            padding: var(--spacing-lg);
+            overflow-y: auto;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-title {
+            margin-bottom: var(--spacing-lg);
+            color: var(--color-text);
+            font-size: var(--font-size-xl);
+            border-bottom: 2px solid var(--color-primary);
+            padding-bottom: var(--spacing-sm);
+        }
+
+        /* Formulario de login */
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: var(--color-white);
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            font-weight: bold;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: var(--spacing-md);
+            border: 1px solid var(--color-secondary-darker);
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-md);
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+        }
+
+        .btn {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-md);
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.5);
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: var(--color-text);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: var(--color-secondary-dark);
+            color: var(--color-text);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--color-secondary-darker);
+        }
+
+        .btn-danger {
+            background-color: var(--color-error);
+            color: var(--color-white);
+        }
+
+        .btn-danger:hover {
+            background-color: #B71C1C;
+        }
+
+        .btn:disabled {
+            background-color: var(--color-secondary-dark);
+            color: var(--color-text-light);
+            cursor: not-allowed;
+        }
+
+        .btn-icon {
+            margin-right: var(--spacing-sm);
+        }
+
+        /* Área de subida de archivos */
+        .upload-area {
+            border: 2px dashed var(--color-secondary-darker);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xxl);
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+            background-color: var(--color-white);
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .upload-area.drag-over {
+            border-color: var(--color-primary);
+            background-color: var(--color-primary-light);
+        }
+
+        .upload-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: var(--spacing-md);
+            fill: var(--color-text-light);
+        }
+
+        .upload-text {
+            margin-bottom: var(--spacing-md);
+        }
+
+        /* Lista de documentos */
+        .documents-list {
+            display: grid;
+            gap: var(--spacing-md);
+        }
+
+        .document-card {
+            background-color: var(--color-white);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: box-shadow 0.2s;
+        }
+
+        .document-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .document-info {
+            flex: 1;
+        }
+
+        .document-name {
+            font-weight: bold;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .document-meta {
+            display: flex;
+            color: var(--color-text-light);
+            font-size: var(--font-size-sm);
+        }
+
+        .document-meta-item {
+            margin-right: var(--spacing-lg);
+        }
+
+        .document-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xxl);
+            color: var(--color-text-light);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--color-text);
+            color: var(--color-white);
+            text-align: center;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-sm);
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--color-white);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: var(--font-size-lg);
+            font-weight: bold;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: var(--font-size-xl);
+            cursor: pointer;
+            color: var(--color-text-light);
+        }
+
+        .modal-body {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--spacing-md);
+        }
+
+        /* Vista previa de impresión */
+        .print-preview {
+            background-color: var(--color-white);
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .print-header {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--color-secondary-dark);
+        }
+
+        .print-content {
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .print-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: var(--spacing-md);
+            fill: var(--color-text-light);
+        }
+
+        /* Mensajes de alerta */
+        .alert {
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .alert-error {
+            background-color: #FFEBEE;
+            color: var(--color-error);
+            border: 1px solid #FFCDD2;
+        }
+
+        .alert-success {
+            background-color: #E8F5E9;
+            color: var(--color-success);
+            border: 1px solid #C8E6C9;
+        }
+
+        /* Botón de menú móvil */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: var(--spacing-md);
+            left: var(--spacing-md);
+            z-index: 200;
+            background-color: var(--color-primary);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-sm);
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .mobile-menu-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.5);
+        }
+
+        .menu-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100%;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .main-content {
+                padding-top: var(--spacing-xxl);
+            }
+
+            .document-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .document-actions {
+                margin-top: var(--spacing-md);
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: var(--spacing-lg);
+            }
+        }
+
+        /* Utilidades */
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-md {
+            margin-top: var(--spacing-md);
+        }
+
+        .mb-md {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Botón de menú móvil -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú">
+        <svg class="menu-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 12H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3 6H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1>Gestión de Documentos</h1>
+                <p>Universidad Mayor</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-item active" data-tab="login">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11 16L13 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M12 16L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M12 7.75732L13.4142 9.17154L15.5355 7.05026L12 3.51472L8.46447 7.05026L10.5858 9.17154L12 7.75732Z" fill="currentColor"/>
+                        <path d="M8 21H16C18.2091 21 20 19.2091 20 17V13C20 10.7909 18.2091 9 16 9H8C5.79086 9 4 10.7909 4 13V17C4 19.2091 5.79086 21 8 21Z" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <span>Inicio de sesión</span>
+                </div>
+                <div class="nav-item" data-tab="documents">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 3V7C14 7.55228 14.4477 8 15 8H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M17 21H7C5.89543 21 5 20.1046 5 19V5C5 3.89543 5.89543 3 7 3H14L19 8V19C19 20.1046 18.1046 21 17 21Z" stroke="currentColor" stroke-width="2"/>
+                        <path d="M9 13H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M9 17H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span>Impresión</span>
+                </div>
+            </nav>
+            
+            <div class="user-info" id="userInfo">
+                <div class="user-name" id="userName"></div>
+                <button class="btn btn-secondary" id="logoutBtn">Cerrar sesión</button>
+            </div>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <!-- Pestaña de inicio de sesión -->
+            <section class="tab-content active" id="loginTab">
+                <h2 class="section-title">Inicio de sesión</h2>
+                
+                <div class="login-form">
+                    <div id="loginAlert" class="alert hidden"></div>
+                    
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="username" class="form-label">Usuario</label>
+                            <input type="text" id="username" class="form-input" required aria-required="true" autocomplete="username">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password" class="form-label">Contraseña</label>
+                            <input type="password" id="password" class="form-input" required aria-required="true" autocomplete="current-password">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                                <path d="M11 16L13 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M12 16L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M12 7.75732L13.4142 9.17154L15.5355 7.05026L12 3.51472L8.46447 7.05026L10.5858 9.17154L12 7.75732Z" fill="currentColor"/>
+                                <path d="M8 21H16C18.2091 21 20 19.2091 20 17V13C20 10.7909 18.2091 9 16 9H8C5.79086 9 4 10.7909 4 13V17C4 19.2091 5.79086 21 8 21Z" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            Iniciar sesión
+                        </button>
+                    </form>
+                    
+                    <div class="mt-md text-center">
+                        <p><small>Para propósitos de demostración, use cualquier usuario y contraseña</small></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pestaña de documentos -->
+            <section class="tab-content" id="documentsTab">
+                <h2 class="section-title">Gestión de documentos</h2>
+                
+                <div id="documentsAlert" class="alert hidden"></div>
+                
+                <!-- Área de subida de archivos -->
+                <div class="upload-area" id="uploadArea">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 3V7C14 7.55228 14.4477 8 15 8H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M17 21H7C5.89543 21 5 20.1046 5 19V5C5 3.89543 5.89543 3 7 3H14L19 8V19C19 20.1046 18.1046 21 17 21Z" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M9 14H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <p class="upload-text">Arrastra y suelta tus archivos aquí</p>
+                    <p class="mb-md">o</p>
+                    <input type="file" id="fileInput" multiple style="display: none;" accept=".pdf,.png,.jpg,.jpeg,.docx">
+                    <button class="btn btn-primary" id="selectFilesBtn">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                            <path d="M14 3V7C14 7.55228 14.4477 8 15 8H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M17 21H7C5.89543 21 5 20.1046 5 19V5C5 3.89543 5.89543 3 7 3H14L19 8V19C19 20.1046 18.1046 21 17 21Z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        Seleccionar archivos
+                    </button>
+                    <p class="mt-md"><small>Formatos permitidos: PDF, PNG, JPG, DOCX. Tamaño máximo: 10MB</small></p>
+                </div>
+                
+                <!-- Lista de documentos -->
+                <div class="documents-list" id="documentsList">
+                    <!-- Los documentos se cargarán aquí dinámicamente -->
+                </div>
+                
+                <!-- Estado vacío -->
+                <div class="empty-state" id="emptyState">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 3V7C14 7.55228 14.4477 8 15 8H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M17 21H7C5.89543 21 5 20.1046 5 19V5C5 3.89543 5.89543 3 7 3H14L19 8V19C19 20.1046 18.1046 21 17 21Z" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <h3>No hay documentos</h3>
+                    <p>Sube tus archivos para comenzar</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal de confirmación de eliminación -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirmar eliminación</h3>
+                <button class="modal-close" id="closeDeleteModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar este documento? Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelDeleteBtn">Cancelar</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de vista previa de impresión -->
+    <div class="modal" id="printModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Vista previa de impresión</h3>
+                <button class="modal-close" id="closePrintModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="print-preview">
+                    <div class="print-header">
+                        <h2>Universidad Mayor</h2>
+                        <p>Vista previa de impresión</p>
+                    </div>
+                    <div class="print-content">
+                        <svg class="print-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 9V2H18V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6 18H4C2.89543 18 2 17.1046 2 16V11C2 9.89543 2.89543 9 4 9H20C21.1046 9 22 9.89543 22 11V16C22 17.1046 21.1046 18 20 18H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M18 14H6V22H18V14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <p id="printFileName">Documento a imprimir</p>
+                        <p class="mt-md"><small>Esta es una simulación de vista previa. En un entorno real, se mostraría el contenido del documento.</small></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelPrintBtn">Cancelar</button>
+                <button class="btn btn-primary" id="confirmPrintBtn">Imprimir</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado de la aplicación
+        const appState = {
+            isLoggedIn: false,
+            currentUser: null,
+            documents: [],
+            currentDocumentToDelete: null,
+            currentDocumentToPrint: null,
+            
+            // Configuración
+            allowedFileTypes: ['.pdf', '.png', '.jpg', '.jpeg', '.docx'],
+            maxFileSize: 10 * 1024 * 1024, // 10MB
+        };
+
+        // Elementos DOM
+        const DOM = {
+            // Sidebar y navegación
+            sidebar: document.getElementById('sidebar'),
+            mobileMenuBtn: document.getElementById('mobileMenuBtn'),
+            navItems: document.querySelectorAll('.nav-item'),
+            tabContents: document.querySelectorAll('.tab-content'),
+            userInfo: document.getElementById('userInfo'),
+            userName: document.getElementById('userName'),
+            logoutBtn: document.getElementById('logoutBtn'),
+            
+            // Login
+            loginForm: document.getElementById('loginForm'),
+            usernameInput: document.getElementById('username'),
+            passwordInput: document.getElementById('password'),
+            loginAlert: document.getElementById('loginAlert'),
+            
+            // Documentos
+            documentsTab: document.getElementById('documentsTab'),
+            uploadArea: document.getElementById('uploadArea'),
+            fileInput: document.getElementById('fileInput'),
+            selectFilesBtn: document.getElementById('selectFilesBtn'),
+            documentsList: document.getElementById('documentsList'),
+            emptyState: document.getElementById('emptyState'),
+            documentsAlert: document.getElementById('documentsAlert'),
+            
+            // Modales
+            deleteModal: document.getElementById('deleteModal'),
+            closeDeleteModal: document.getElementById('closeDeleteModal'),
+            cancelDeleteBtn: document.getElementById('cancelDeleteBtn'),
+            confirmDeleteBtn: document.getElementById('confirmDeleteBtn'),
+            
+            printModal: document.getElementById('printModal'),
+            closePrintModal: document.getElementById('closePrintModal'),
+            cancelPrintBtn: document.getElementById('cancelPrintBtn'),
+            confirmPrintBtn: document.getElementById('confirmPrintBtn'),
+            printFileName: document.getElementById('printFileName'),
+        };
+
+        // Utilidades
+        const utils = {
+            // Formatear tamaño de archivo
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            },
+            
+            // Formatear fecha
+            formatDate(date) {
+                return new Date(date).toLocaleString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            },
+            
+            // Sanitizar HTML para prevenir XSS
+            sanitizeHTML(str) {
+                const temp = document.createElement('div');
+                temp.textContent = str;
+                return temp.innerHTML;
+            },
+            
+            // Mostrar alerta
+            showAlert(alertElement, message, type = 'error') {
+                alertElement.textContent = message;
+                alertElement.className = `alert alert-${type}`;
+                alertElement.classList.remove('hidden');
+                
+                // Ocultar después de 5 segundos
+                setTimeout(() => {
+                    alertElement.classList.add('hidden');
+                }, 5000);
+            },
+            
+            // Validar tipo de archivo
+            isValidFileType(file) {
+                const extension = '.' + file.name.split('.').pop().toLowerCase();
+                return appState.allowedFileTypes.includes(extension);
+            },
+            
+            // Validar tamaño de archivo
+            isValidFileSize(file) {
+                return file.size <= appState.maxFileSize;
+            }
+        };
+
+        // Gestión de sesión
+        const sessionManager = {
+            // Iniciar sesión
+            login(username, password) {
+                // En un entorno real, aquí se haría una petición al servidor
+                // Para este prototipo, simulamos un login exitoso con cualquier credencial
+                
+                appState.isLoggedIn = true;
+                appState.currentUser = {
+                    username: username,
+                    name: username
+                };
+                
+                // Guardar en sessionStorage
+                sessionStorage.setItem('isLoggedIn', 'true');
+                sessionStorage.setItem('currentUser', JSON.stringify(appState.currentUser));
+                
+                // Actualizar UI
+                this.updateUIAfterLogin();
+                
+                // Mostrar mensaje de éxito
+                utils.showAlert(DOM.loginAlert, `Bienvenido, ${username}!`, 'success');
+            },
+            
+            // Cerrar sesión
+            logout() {
+                appState.isLoggedIn = false;
+                appState.currentUser = null;
+                
+                // Limpiar sessionStorage
+                sessionStorage.removeItem('isLoggedIn');
+                sessionStorage.removeItem('currentUser');
+                
+                // Limpiar documentos del localStorage (opcional)
+                // localStorage.removeItem('documents');
+                
+                // Actualizar UI
+                this.updateUIAfterLogout();
+                
+                // Mostrar mensaje
+                utils.showAlert(DOM.loginAlert, 'Sesión cerrada correctamente', 'success');
+            },
+            
+            // Comprobar si hay sesión activa
+            checkSession() {
+                const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+                const currentUser = sessionStorage.getItem('currentUser');
+                
+                if (isLoggedIn === 'true' && currentUser) {
+                    appState.isLoggedIn = true;
+                    appState.currentUser = JSON.parse(currentUser);
+                    this.updateUIAfterLogin();
+                    return true;
+                }
+                
+                return false;
+            },
+            
+            // Actualizar UI después del login
+            updateUIAfterLogin() {
+                // Mostrar información del usuario
+                DOM.userName.textContent = appState.currentUser.name;
+                DOM.userInfo.classList.add('visible');
+                
+                // Cambiar a la pestaña de documentos
+                this.switchTab('documents');
+                
+                // Cargar documentos
+                documentManager.loadDocuments();
+            },
+            
+            // Actualizar UI después del logout
+            updateUIAfterLogout() {
+                // Ocultar información del usuario
+                DOM.userInfo.classList.remove('visible');
+                
+                // Cambiar a la pestaña de login
+                this.switchTab('login');
+                
+                // Limpiar formulario
+                DOM.loginForm.reset();
+                
+                // Limpiar lista de documentos
+                DOM.documentsList.innerHTML = '';
+                DOM.emptyState.classList.remove('hidden');
+            },
+            
+            // Cambiar de pestaña
+            switchTab(tabName) {
+                // Actualizar navegación
+                DOM.navItems.forEach(item => {
+                    if (item.dataset.tab === tabName) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+                
+                // Actualizar contenido
+                DOM.tabContents.forEach(content => {
+                    if (content.id === `${tabName}Tab`) {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
+                
+                // En móvil, cerrar sidebar al cambiar de pestaña
+                if (window.innerWidth <= 768) {
+                    DOM.sidebar.classList.remove('active');
+                }
+            }
+        };
+
+        // Gestión de documentos
+        const documentManager = {
+            // Cargar documentos desde localStorage
+            loadDocuments() {
+                const storedDocuments = localStorage.getItem('documents');
+                if (storedDocuments) {
+                    appState.documents = JSON.parse(storedDocuments);
+                    this.renderDocuments();
+                }
+            },
+            
+            // Guardar documentos en localStorage
+            saveDocuments() {
+                localStorage.setItem('documents', JSON.stringify(appState.documents));
+            },
+            
+            // Agregar documento
+            addDocument(file) {
+                const document = {
+                    id: Date.now().toString(),
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    uploadDate: new Date().toISOString(),
+                    printed: false
+                };
+                
+                appState.documents.unshift(document);
+                this.saveDocuments();
+                this.renderDocuments();
+                
+                // Mostrar mensaje de éxito
+                utils.showAlert(DOM.documentsAlert, `Documento "${utils.sanitizeHTML(file.name)}" subido correctamente`, 'success');
+            },
+            
+            // Eliminar documento
+            deleteDocument(documentId) {
+                appState.documents = appState.documents.filter(doc => doc.id !== documentId);
+                this.saveDocuments();
+                this.renderDocuments();
+                
+                // Cerrar modal
+                DOM.deleteModal.classList.remove('active');
+            },
+            
+            // Marcar documento como impreso
+            markAsPrinted(documentId) {
+                const document = appState.documents.find(doc => doc.id === documentId);
+                if (document) {
+                    document.printed = true;
+                    this.saveDocuments();
+                    this.renderDocuments();
+                }
+            },
+            
+            // Renderizar lista de documentos
+            renderDocuments() {
+                if (appState.documents.length === 0) {
+                    DOM.emptyState.classList.remove('hidden');
+                    DOM.documentsList.innerHTML = '';
+                    return;
+                }
+                
+                DOM.emptyState.classList.add('hidden');
+                
+                const documentsHTML = appState.documents.map(doc => `
+                    <div class="document-card" data-document-id="${doc.id}">
+                        <div class="document-info">
+                            <div class="document-name">${utils.sanitizeHTML(doc.name)}</div>
+                            <div class="document-meta">
+                                <span class="document-meta-item">${utils.formatFileSize(doc.size)}</span>
+                                <span class="document-meta-item">${utils.formatDate(doc.uploadDate)}</span>
+                                ${doc.printed ? '<span class="document-meta-item" style="color: var(--color-success);">✓ Impreso</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="document-actions">
+                            <button class="btn btn-danger delete-document-btn" data-document-id="${doc.id}">
+                                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                                    <path d="M19 7L18.1327 19.1425C18.0579 20.1891 17.187 21 16.1378 21H7.86224C6.81296 21 5.94208 20.1891 5.86732 19.1425L5 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M3 7H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M10 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M14 11V17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M8 7V4C8 3.44772 8.44772 3 9 3H15C15.5523 3 16 3.44772 16 4V7" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                Eliminar
+                            </button>
+                            ${appState.isLoggedIn ? 
+                                `<button class="btn btn-primary print-document-btn" data-document-id="${doc.id}">
+                                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                                        <path d="M6 9V2H18V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M6 18H4C2.89543 18 2 17.1046 2 16V11C2 9.89543 2.89543 9 4 9H20C21.1046 9 22 9.89543 22 11V16C22 17.1046 21.1046 18 20 18H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M18 14H6V22H18V14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Imprimir
+                                </button>` : 
+                                `<div class="tooltip">
+                                    <button class="btn btn-primary" disabled>
+                                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+                                            <path d="M6 9V2H18V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M6 18H4C2.89543 18 2 17.1046 2 16V11C2 9.89543 2.89543 9 4 9H20C21.1046 9 22 9.89543 22 11V16C22 17.1046 21.1046 18 20 18H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M18 14H6V22H18V14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        Imprimir
+                                    </button>
+                                    <span class="tooltip-text">Debes iniciar sesión para imprimir</span>
+                                </div>`
+                            }
+                        </div>
+                    </div>
+                `).join('');
+                
+                DOM.documentsList.innerHTML = documentsHTML;
+                
+                // Añadir event listeners a los botones
+                this.attachDocumentEventListeners();
+            },
+            
+            // Adjuntar event listeners a los botones de documentos
+            attachDocumentEventListeners() {
+                // Botones de eliminar
+                const deleteButtons = document.querySelectorAll('.delete-document-btn');
+                deleteButtons.forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const documentId = button.dataset.documentId;
+                        this.prepareDeleteDocument(documentId);
+                    });
+                });
+                
+                // Botones de imprimir
+                const printButtons = document.querySelectorAll('.print-document-btn');
+                printButtons.forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const documentId = button.dataset.documentId;
+                        this.preparePrintDocument(documentId);
+                    });
+                });
+            },
+            
+            // Preparar eliminación de documento
+            prepareDeleteDocument(documentId) {
+                appState.currentDocumentToDelete = documentId;
+                DOM.deleteModal.classList.add('active');
+            },
+            
+            // Preparar impresión de documento
+            preparePrintDocument(documentId) {
+                if (!appState.isLoggedIn) {
+                    utils.showAlert(DOM.documentsAlert, 'Debes iniciar sesión para imprimir documentos', 'error');
+                    return;
+                }
+                
+                const document = appState.documents.find(doc => doc.id === documentId);
+                if (document) {
+                    appState.currentDocumentToPrint = documentId;
+                    DOM.printFileName.textContent = document.name;
+                    DOM.printModal.classList.add('active');
+                }
+            },
+            
+            // Procesar archivos subidos
+            processFiles(files) {
+                let hasErrors = false;
+                
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    
+                    // Validar tipo de archivo
+                    if (!utils.isValidFileType(file)) {
+                        utils.showAlert(DOM.documentsAlert, `El archivo "${utils.sanitizeHTML(file.name)}" no es de un tipo permitido`, 'error');
+                        hasErrors = true;
+                        continue;
+                    }
+                    
+                    // Validar tamaño de archivo
+                    if (!utils.isValidFileSize(file)) {
+                        utils.showAlert(DOM.documentsAlert, `El archivo "${utils.sanitizeHTML(file.name)}" excede el tamaño máximo permitido (10MB)`, 'error');
+                        hasErrors = true;
+                        continue;
+                    }
+                    
+                    // Agregar documento
+                    this.addDocument(file);
+                }
+                
+                return !hasErrors;
+            }
+        };
+
+        // Inicialización de la aplicación
+        const initApp = () => {
+            // Comprobar si hay sesión activa
+            sessionManager.checkSession();
+            
+            // Event listeners para navegación
+            DOM.navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const tabName = item.dataset.tab;
+                    sessionManager.switchTab(tabName);
+                });
+            });
+            
+            // Event listener para el botón de menú móvil
+            DOM.mobileMenuBtn.addEventListener('click', () => {
+                DOM.sidebar.classList.toggle('active');
+            });
+            
+            // Event listener para el formulario de login
+            DOM.loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const username = DOM.usernameInput.value.trim();
+                const password = DOM.passwordInput.value;
+                
+                if (!username || !password) {
+                    utils.showAlert(DOM.loginAlert, 'Por favor, completa todos los campos', 'error');
+                    return;
+                }
+                
+                sessionManager.login(username, password);
+            });
+            
+            // Event listener para cerrar sesión
+            DOM.logoutBtn.addEventListener('click', () => {
+                sessionManager.logout();
+            });
+            
+            // Event listeners para subida de archivos
+            DOM.selectFilesBtn.addEventListener('click', () => {
+                DOM.fileInput.click();
+            });
+            
+            DOM.fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    documentManager.processFiles(e.target.files);
+                    DOM.fileInput.value = ''; // Resetear input
+                }
+            });
+            
+            // Drag & drop
+            DOM.uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                DOM.uploadArea.classList.add('drag-over');
+            });
+            
+            DOM.uploadArea.addEventListener('dragleave', () => {
+                DOM.uploadArea.classList.remove('drag-over');
+            });
+            
+            DOM.uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                DOM.uploadArea.classList.remove('drag-over');
+                
+                if (e.dataTransfer.files.length > 0) {
+                    documentManager.processFiles(e.dataTransfer.files);
+                }
+            });
+            
+            // Event listeners para modales
+            // Modal de eliminación
+            DOM.closeDeleteModal.addEventListener('click', () => {
+                DOM.deleteModal.classList.remove('active');
+            });
+            
+            DOM.cancelDeleteBtn.addEventListener('click', () => {
+                DOM.deleteModal.classList.remove('active');
+            });
+            
+            DOM.confirmDeleteBtn.addEventListener('click', () => {
+                if (appState.currentDocumentToDelete) {
+                    documentManager.deleteDocument(appState.currentDocumentToDelete);
+                    appState.currentDocumentToDelete = null;
+                }
+            });
+            
+            // Modal de impresión
+            DOM.closePrintModal.addEventListener('click', () => {
+                DOM.printModal.classList.remove('active');
+            });
+            
+            DOM.cancelPrintBtn.addEventListener('click', () => {
+                DOM.printModal.classList.remove('active');
+            });
+            
+            DOM.confirmPrintBtn.addEventListener('click', () => {
+                if (appState.currentDocumentToPrint) {
+                    // Simular impresión
+                    window.print();
+                    
+                    // Marcar como impreso
+                    documentManager.markAsPrinted(appState.currentDocumentToPrint);
+                    
+                    // Cerrar modal
+                    DOM.printModal.classList.remove('active');
+                    
+                    // Mostrar mensaje
+                    utils.showAlert(DOM.documentsAlert, 'Documento enviado a impresión', 'success');
+                }
+            });
+            
+            // Cerrar modales al hacer clic fuera
+            window.addEventListener('click', (e) => {
+                if (e.target === DOM.deleteModal) {
+                    DOM.deleteModal.classList.remove('active');
+                }
+                if (e.target === DOM.printModal) {
+                    DOM.printModal.classList.remove('active');
+                }
+            });
+        };
+
+        // Inicializar la aplicación cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+
+    <!-- Comentarios para integración con backend real -->
+    <!-- 
+    INTEGRACIÓN CON BACKEND REAL:
+    
+    1. AUTENTICACIÓN:
+       - Reemplazar la función sessionManager.login() con una llamada a la API real
+       - Endpoint recomendado: POST /api/auth/login
+       - Enviar credenciales: { username, password }
+       - Recibir y almacenar token JWT en localStorage o sessionStorage
+       - Incluir token en cabeceras de futuras peticiones
+    
+    2. SUBIDA DE ARCHIVOS:
+       - Reemplazar documentManager.addDocument() con una llamada a la API real
+       - Endpoint recomendado: POST /api/documents/upload
+       - Usar FormData para enviar el archivo
+       - Incluir token de autenticación en la cabecera
+       - Manejar respuesta del servidor con URL o ID del documento
+    
+    3. ELIMINACIÓN DE ARCHIVOS:
+       - Reemplazar documentManager.deleteDocument() con una llamada a la API real
+       - Endpoint recomendado: DELETE /api/documents/{id}
+       - Incluir token de autenticación en la cabecera
+    
+    4. IMPRESIÓN:
+       - Reemplazar la simulación con una llamada a la API real
+       - Endpoint recomendado: POST /api/print/{documentId}
+       - Incluir token de autenticación en la cabecera
+       - El backend debería manejar la cola de impresión y notificaciones
+    
+    5. SEGURIDAD:
+       - Validar todos los inputs en el backend
+       - Sanitizar nombres de archivo
+       - Verificar tipos MIME reales, no solo extensiones
+       - Implementar límites de tamaño por usuario/rol
+       - Usar HTTPS en producción
+    
+    6. PERSISTENCIA:
+       - Reemplazar localStorage con llamadas a la API para cargar documentos
+       - Endpoint recomendado: GET /api/documents
+       - Implementar paginación si hay muchos documentos
+    -->
+
+    <!-- Casos de prueba / Criterios de aceptación -->
+    <!-- 
+    CASOS DE PRUEBA MANUALES:
+    
+    1. INICIO DE SESIÓN:
+       - Al cargar la página, debe mostrarse la pestaña "Inicio de sesión"
+       - Introducir cualquier usuario y contraseña debe iniciar sesión correctamente
+       - Debe mostrarse un mensaje de bienvenida
+       - Debe cambiar a la pestaña "Impresión" automáticamente
+       - Debe mostrarse el nombre de usuario en el sidebar
+    
+    2. SUBIDA DE ARCHIVOS:
+       - Arrastrar y soltar un archivo válido debe agregarlo a la lista
+       - Hacer clic en "Seleccionar archivos" y elegir un archivo válido debe agregarlo
+       - Intentar subir un archivo con tipo no permitido debe mostrar error
+       - Intentar subir un archivo mayor a 10MB debe mostrar error
+    
+    3. ELIMINACIÓN DE ARCHIVOS:
+       - Hacer clic en "Eliminar" debe mostrar un modal de confirmación
+       - Confirmar la eliminación debe quitar el documento de la lista
+       - Cancelar la eliminación debe mantener el documento en la lista
+    
+    4. IMPRESIÓN:
+       - Hacer clic en "Imprimir" debe abrir el modal de vista previa
+       - Confirmar la impresión debe simular la impresión y marcar el documento como impreso
+       - El documento impreso debe mostrar el indicador "✓ Impreso"
+    
+    5. CIERRE DE SESIÓN:
+       - Hacer clic en "Cerrar sesión" debe volver a la pestaña de inicio de sesión
+       - Los botones de impresión deben estar deshabilitados y mostrar tooltip
+       - La información de usuario debe ocultarse
+    
+    6. RESPONSIVE:
+       - En pantallas móviles (<768px), el sidebar debe estar oculto inicialmente
+       - El botón de menú móvil debe mostrar/ocultar el sidebar
+       - Al cambiar de pestaña en móvil, el sidebar debe ocultarse automáticamente
+       - Los botones y formularios deben ser accesibles en pantallas pequeñas
+    -->
+</body>
+</html>
