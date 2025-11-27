@@ -18,6 +18,7 @@
             --color-white: #FFFFFF;
             --color-error: #D32F2F;
             --color-success: #388E3C;
+            --color-warning: #FFA000;
             
             /* Espaciado */
             --spacing-xs: 0.25rem;
@@ -234,6 +235,15 @@
             background-color: #B71C1C;
         }
 
+        .btn-warning {
+            background-color: var(--color-warning);
+            color: var(--color-white);
+        }
+
+        .btn-warning:hover {
+            background-color: #FF8F00;
+        }
+
         .btn:disabled {
             background-color: var(--color-secondary-dark);
             color: var(--color-text-light);
@@ -407,35 +417,67 @@
             gap: var(--spacing-md);
         }
 
-        /* Vista previa de impresión */
-        .print-preview {
+        /* Lista de impresión */
+        .print-queue-section {
             background-color: var(--color-white);
-            padding: var(--spacing-xl);
             border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
             box-shadow: var(--shadow-sm);
             margin-bottom: var(--spacing-lg);
         }
 
-        .print-header {
-            text-align: center;
-            margin-bottom: var(--spacing-lg);
-            padding-bottom: var(--spacing-md);
-            border-bottom: 1px solid var(--color-secondary-dark);
+        .print-queue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
         }
 
-        .print-content {
-            min-height: 400px;
+        .print-queue-title {
+            font-size: var(--font-size-lg);
+            font-weight: bold;
+            color: var(--color-text);
+        }
+
+        .print-queue-count {
+            background-color: var(--color-primary);
+            color: var(--color-text);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
+            font-size: var(--font-size-sm);
+            font-weight: bold;
         }
 
-        .print-icon {
-            width: 64px;
-            height: 64px;
-            margin-bottom: var(--spacing-md);
-            fill: var(--color-text-light);
+        .print-queue-list {
+            display: grid;
+            gap: var(--spacing-sm);
+        }
+
+        .print-queue-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-sm);
+            background-color: var(--color-secondary-light);
+            border-radius: var(--border-radius);
+        }
+
+        .print-queue-item-name {
+            font-size: var(--font-size-sm);
+            flex: 1;
+            margin-right: var(--spacing-sm);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .print-queue-item-actions {
+            display: flex;
+            gap: var(--spacing-xs);
         }
 
         /* Mensajes de alerta */
@@ -455,6 +497,12 @@
             background-color: #E8F5E9;
             color: var(--color-success);
             border: 1px solid #C8E6C9;
+        }
+
+        .alert-warning {
+            background-color: #FFF8E1;
+            color: var(--color-warning);
+            border: 1px solid #FFECB3;
         }
 
         /* Botón de menú móvil */
@@ -523,6 +571,12 @@
                 width: 95%;
                 padding: var(--spacing-lg);
             }
+            
+            .print-queue-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--spacing-sm);
+            }
         }
 
         /* Utilidades */
@@ -578,7 +632,7 @@
                         <path d="M9 13H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                         <path d="M9 17H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     </svg>
-                    <span>Impresión</span>
+                    <span>Documentos</span>
                 </div>
             </nav>
             
@@ -630,6 +684,20 @@
                 <h2 class="section-title">Gestión de documentos</h2>
                 
                 <div id="documentsAlert" class="alert hidden"></div>
+                
+                <!-- Lista de impresión -->
+                <div class="print-queue-section">
+                    <div class="print-queue-header">
+                        <div class="print-queue-title">Lista de impresión</div>
+                        <div class="print-queue-count" id="printQueueCount">0</div>
+                    </div>
+                    <div class="print-queue-list" id="printQueueList">
+                        <!-- Los documentos en cola se cargarán aquí dinámicamente -->
+                    </div>
+                    <div class="empty-state" id="printQueueEmptyState">
+                        <p>No hay documentos en la lista de impresión</p>
+                    </div>
+                </div>
                 
                 <!-- Área de subida de archivos -->
                 <div class="upload-area" id="uploadArea">
@@ -687,33 +755,19 @@
         </div>
     </div>
 
-    <!-- Modal de vista previa de impresión -->
-    <div class="modal" id="printModal">
+    <!-- Modal de confirmación de eliminación de cola de impresión -->
+    <div class="modal" id="removeFromQueueModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Vista previa de impresión</h3>
-                <button class="modal-close" id="closePrintModal">&times;</button>
+                <h3 class="modal-title">Eliminar de la lista de impresión</h3>
+                <button class="modal-close" id="closeRemoveFromQueueModal">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="print-preview">
-                    <div class="print-header">
-                        <h2>Universidad Mayor</h2>
-                        <p>Vista previa de impresión</p>
-                    </div>
-                    <div class="print-content">
-                        <svg class="print-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6 9V2H18V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M6 18H4C2.89543 18 2 17.1046 2 16V11C2 9.89543 2.89543 9 4 9H20C21.1046 9 22 9.89543 22 11V16C22 17.1046 21.1046 18 20 18H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M18 14H6V22H18V14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <p id="printFileName">Documento a imprimir</p>
-                        <p class="mt-md"><small>Esta es una simulación de vista previa. En un entorno real, se mostraría el contenido del documento.</small></p>
-                    </div>
-                </div>
+                <p>¿Estás seguro de que deseas eliminar este documento de la lista de impresión?</p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" id="cancelPrintBtn">Cancelar</button>
-                <button class="btn btn-primary" id="confirmPrintBtn">Imprimir</button>
+                <button class="btn btn-secondary" id="cancelRemoveFromQueueBtn">Cancelar</button>
+                <button class="btn btn-danger" id="confirmRemoveFromQueueBtn">Eliminar</button>
             </div>
         </div>
     </div>
@@ -724,8 +778,9 @@
             isLoggedIn: false,
             currentUser: null,
             documents: [],
+            printQueue: [],
             currentDocumentToDelete: null,
-            currentDocumentToPrint: null,
+            currentDocumentToRemoveFromQueue: null,
             
             // Configuración
             allowedFileTypes: ['.pdf', '.png', '.jpg', '.jpeg', '.docx'],
@@ -758,17 +813,21 @@
             emptyState: document.getElementById('emptyState'),
             documentsAlert: document.getElementById('documentsAlert'),
             
+            // Lista de impresión
+            printQueueList: document.getElementById('printQueueList'),
+            printQueueEmptyState: document.getElementById('printQueueEmptyState'),
+            printQueueCount: document.getElementById('printQueueCount'),
+            
             // Modales
             deleteModal: document.getElementById('deleteModal'),
             closeDeleteModal: document.getElementById('closeDeleteModal'),
             cancelDeleteBtn: document.getElementById('cancelDeleteBtn'),
             confirmDeleteBtn: document.getElementById('confirmDeleteBtn'),
             
-            printModal: document.getElementById('printModal'),
-            closePrintModal: document.getElementById('closePrintModal'),
-            cancelPrintBtn: document.getElementById('cancelPrintBtn'),
-            confirmPrintBtn: document.getElementById('confirmPrintBtn'),
-            printFileName: document.getElementById('printFileName'),
+            removeFromQueueModal: document.getElementById('removeFromQueueModal'),
+            closeRemoveFromQueueModal: document.getElementById('closeRemoveFromQueueModal'),
+            cancelRemoveFromQueueBtn: document.getElementById('cancelRemoveFromQueueBtn'),
+            confirmRemoveFromQueueBtn: document.getElementById('confirmRemoveFromQueueBtn'),
         };
 
         // Utilidades
@@ -893,6 +952,7 @@
                 
                 // Cargar documentos
                 documentManager.loadDocuments();
+                documentManager.loadPrintQueue();
             },
             
             // Actualizar UI después del logout
@@ -909,6 +969,11 @@
                 // Limpiar lista de documentos
                 DOM.documentsList.innerHTML = '';
                 DOM.emptyState.classList.remove('hidden');
+                
+                // Limpiar lista de impresión
+                DOM.printQueueList.innerHTML = '';
+                DOM.printQueueEmptyState.classList.remove('hidden');
+                DOM.printQueueCount.textContent = '0';
             },
             
             // Cambiar de pestaña
@@ -949,9 +1014,23 @@
                 }
             },
             
+            // Cargar lista de impresión desde localStorage
+            loadPrintQueue() {
+                const storedPrintQueue = localStorage.getItem('printQueue');
+                if (storedPrintQueue) {
+                    appState.printQueue = JSON.parse(storedPrintQueue);
+                    this.renderPrintQueue();
+                }
+            },
+            
             // Guardar documentos en localStorage
             saveDocuments() {
                 localStorage.setItem('documents', JSON.stringify(appState.documents));
+            },
+            
+            // Guardar lista de impresión en localStorage
+            savePrintQueue() {
+                localStorage.setItem('printQueue', JSON.stringify(appState.printQueue));
             },
             
             // Agregar documento
@@ -961,8 +1040,7 @@
                     name: file.name,
                     size: file.size,
                     type: file.type,
-                    uploadDate: new Date().toISOString(),
-                    printed: false
+                    uploadDate: new Date().toISOString()
                 };
                 
                 appState.documents.unshift(document);
@@ -979,18 +1057,43 @@
                 this.saveDocuments();
                 this.renderDocuments();
                 
+                // También eliminar de la lista de impresión si está ahí
+                const indexInQueue = appState.printQueue.findIndex(doc => doc.id === documentId);
+                if (indexInQueue !== -1) {
+                    appState.printQueue.splice(indexInQueue, 1);
+                    this.savePrintQueue();
+                    this.renderPrintQueue();
+                }
+                
                 // Cerrar modal
                 DOM.deleteModal.classList.remove('active');
             },
             
-            // Marcar documento como impreso
-            markAsPrinted(documentId) {
-                const document = appState.documents.find(doc => doc.id === documentId);
-                if (document) {
-                    document.printed = true;
-                    this.saveDocuments();
-                    this.renderDocuments();
+            // Agregar documento a la lista de impresión
+            addToPrintQueue(document) {
+                // Verificar si ya está en la lista
+                const exists = appState.printQueue.some(doc => doc.id === document.id);
+                if (exists) {
+                    utils.showAlert(DOM.documentsAlert, 'El documento ya está en la lista de impresión', 'warning');
+                    return;
                 }
+                
+                appState.printQueue.push(document);
+                this.savePrintQueue();
+                this.renderPrintQueue();
+                
+                // Mostrar mensaje de éxito
+                utils.showAlert(DOM.documentsAlert, `Documento "${utils.sanitizeHTML(document.name)}" agregado a la lista de impresión`, 'success');
+            },
+            
+            // Eliminar documento de la lista de impresión
+            removeFromPrintQueue(documentId) {
+                appState.printQueue = appState.printQueue.filter(doc => doc.id !== documentId);
+                this.savePrintQueue();
+                this.renderPrintQueue();
+                
+                // Cerrar modal
+                DOM.removeFromQueueModal.classList.remove('active');
             },
             
             // Renderizar lista de documentos
@@ -1004,17 +1107,22 @@
                 DOM.emptyState.classList.add('hidden');
                 
                 const documentsHTML = appState.documents.map(doc => `
-                    <div class="document-card" data-document-id="${doc.id}">
+                    
+
                         <div class="document-info">
-                            <div class="document-name">${utils.sanitizeHTML(doc.name)}</div>
-                            <div class="document-meta">
-                                <span class="document-meta-item">${utils.formatFileSize(doc.size)}</span>
-                                <span class="document-meta-item">${utils.formatDate(doc.uploadDate)}</span>
-                                ${doc.printed ? '<span class="document-meta-item" style="color: var(--color-success);">✓ Impreso</span>' : ''}
-                            </div>
-                        </div>
-                        <div class="document-actions">
-                            <button class="btn btn-danger delete-document-btn" data-document-id="${doc.id}">
+                            <div class="document-name">${utils.sanitizeHTML(doc.name)}
+
+                            
+
+                                ${utils.formatFileSize(doc.size)}</span>
+                                <span class="document-meta-item">${utils.formatDate(doc.uploadDate)}
+                            
+
+                        
+
+                        
+
+                            
                                 <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
                                     <path d="M19 7L18.1327 19.1425C18.0579 20.1891 17.187 21 16.1378 21H7.86224C6.81296 21 5.94208 20.1891 5.86732 19.1425L5 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                                     <path d="M3 7H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1025,13 +1133,13 @@
                                 Eliminar
                             </button>
                             ${appState.isLoggedIn ? 
-                                `<button class="btn btn-primary print-document-btn" data-document-id="${doc.id}">
+                                `
                                     <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
                                         <path d="M6 9V2H18V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                         <path d="M6 18H4C2.89543 18 2 17.1046 2 16V11C2 9.89543 2.89543 9 4 9H20C21.1046 9 22 9.89543 22 11V16C22 17.1046 21.1046 18 20 18H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                         <path d="M18 14H6V22H18V14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
-                                    Imprimir
+                                    Añadir a impresión
                                 </button>` : 
                                 `<div class="tooltip">
                                     <button class="btn btn-primary" disabled>
@@ -1040,9 +1148,9 @@
                                             <path d="M6 18H4C2.89543 18 2 17.1046 2 16V11C2 9.89543 2.89543 9 4 9H20C21.1046 9 22 9.89543 22 11V16C22 17.1046 21.1046 18 20 18H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                             <path d="M18 14H6V22H18V14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                         </svg>
-                                        Imprimir
+                                        Añadir a impresión
                                     </button>
-                                    <span class="tooltip-text">Debes iniciar sesión para imprimir</span>
+                                    <span class="tooltip-text">Debes iniciar sesión para añadir a impresión</span>
                                 </div>`
                             }
                         </div>
@@ -1053,6 +1161,35 @@
                 
                 // Añadir event listeners a los botones
                 this.attachDocumentEventListeners();
+            },
+            
+            // Renderizar lista de impresión
+            renderPrintQueue() {
+                DOM.printQueueCount.textContent = appState.printQueue.length;
+                
+                if (appState.printQueue.length === 0) {
+                    DOM.printQueueEmptyState.classList.remove('hidden');
+                    DOM.printQueueList.innerHTML = '';
+                    return;
+                }
+                
+                DOM.printQueueEmptyState.classList.add('hidden');
+                
+                const printQueueHTML = appState.printQueue.map(doc => `
+                    <div class="print-queue-item" data-document-id="%%%LATEX_BLOCK_6%%%{utils.sanitizeHTML(doc.name)}</div>
+                        <div class="print-queue-item-actions">
+                            <button class="btn btn-danger remove-from-queue-btn" data-document-id="${doc.id}" title="Eliminar de la lista">
+                                
+                            
+                        
+
+                    
+                `).join('');
+                
+                DOM.printQueueList.innerHTML = printQueueHTML;
+                
+                // Añadir event listeners a los botones de la lista de impresión
+                this.attachPrintQueueEventListeners();
             },
             
             // Adjuntar event listeners a los botones de documentos
@@ -1067,13 +1204,29 @@
                     });
                 });
                 
-                // Botones de imprimir
-                const printButtons = document.querySelectorAll('.print-document-btn');
-                printButtons.forEach(button => {
+                // Botones de añadir a impresión
+                const addToPrintQueueButtons = document.querySelectorAll('.add-to-print-queue-btn');
+                addToPrintQueueButtons.forEach(button => {
                     button.addEventListener('click', (e) => {
                         e.stopPropagation();
                         const documentId = button.dataset.documentId;
-                        this.preparePrintDocument(documentId);
+                        const document = appState.documents.find(doc => doc.id === documentId);
+                        if (document) {
+                            this.addToPrintQueue(document);
+                        }
+                    });
+                });
+            },
+            
+            // Adjuntar event listeners a los botones de la lista de impresión
+            attachPrintQueueEventListeners() {
+                // Botones de eliminar de la lista de impresión
+                const removeFromQueueButtons = document.querySelectorAll('.remove-from-queue-btn');
+                removeFromQueueButtons.forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const documentId = button.dataset.documentId;
+                        this.prepareRemoveFromPrintQueue(documentId);
                     });
                 });
             },
@@ -1084,19 +1237,10 @@
                 DOM.deleteModal.classList.add('active');
             },
             
-            // Preparar impresión de documento
-            preparePrintDocument(documentId) {
-                if (!appState.isLoggedIn) {
-                    utils.showAlert(DOM.documentsAlert, 'Debes iniciar sesión para imprimir documentos', 'error');
-                    return;
-                }
-                
-                const document = appState.documents.find(doc => doc.id === documentId);
-                if (document) {
-                    appState.currentDocumentToPrint = documentId;
-                    DOM.printFileName.textContent = document.name;
-                    DOM.printModal.classList.add('active');
-                }
+            // Preparar eliminación de documento de la lista de impresión
+            prepareRemoveFromPrintQueue(documentId) {
+                appState.currentDocumentToRemoveFromQueue = documentId;
+                DOM.removeFromQueueModal.classList.add('active');
             },
             
             // Procesar archivos subidos
@@ -1214,28 +1358,19 @@
                 }
             });
             
-            // Modal de impresión
-            DOM.closePrintModal.addEventListener('click', () => {
-                DOM.printModal.classList.remove('active');
+            // Modal de eliminación de cola de impresión
+            DOM.closeRemoveFromQueueModal.addEventListener('click', () => {
+                DOM.removeFromQueueModal.classList.remove('active');
             });
             
-            DOM.cancelPrintBtn.addEventListener('click', () => {
-                DOM.printModal.classList.remove('active');
+            DOM.cancelRemoveFromQueueBtn.addEventListener('click', () => {
+                DOM.removeFromQueueModal.classList.remove('active');
             });
             
-            DOM.confirmPrintBtn.addEventListener('click', () => {
-                if (appState.currentDocumentToPrint) {
-                    // Simular impresión
-                    window.print();
-                    
-                    // Marcar como impreso
-                    documentManager.markAsPrinted(appState.currentDocumentToPrint);
-                    
-                    // Cerrar modal
-                    DOM.printModal.classList.remove('active');
-                    
-                    // Mostrar mensaje
-                    utils.showAlert(DOM.documentsAlert, 'Documento enviado a impresión', 'success');
+            DOM.confirmRemoveFromQueueBtn.addEventListener('click', () => {
+                if (appState.currentDocumentToRemoveFromQueue) {
+                    documentManager.removeFromPrintQueue(appState.currentDocumentToRemoveFromQueue);
+                    appState.currentDocumentToRemoveFromQueue = null;
                 }
             });
             
@@ -1244,8 +1379,8 @@
                 if (e.target === DOM.deleteModal) {
                     DOM.deleteModal.classList.remove('active');
                 }
-                if (e.target === DOM.printModal) {
-                    DOM.printModal.classList.remove('active');
+                if (e.target === DOM.removeFromQueueModal) {
+                    DOM.removeFromQueueModal.classList.remove('active');
                 }
             });
         };
@@ -1253,86 +1388,5 @@
         // Inicializar la aplicación cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
-
-    <!-- Comentarios para integración con backend real -->
-    <!-- 
-    INTEGRACIÓN CON BACKEND REAL:
-    
-    1. AUTENTICACIÓN:
-       - Reemplazar la función sessionManager.login() con una llamada a la API real
-       - Endpoint recomendado: POST /api/auth/login
-       - Enviar credenciales: { username, password }
-       - Recibir y almacenar token JWT en localStorage o sessionStorage
-       - Incluir token en cabeceras de futuras peticiones
-    
-    2. SUBIDA DE ARCHIVOS:
-       - Reemplazar documentManager.addDocument() con una llamada a la API real
-       - Endpoint recomendado: POST /api/documents/upload
-       - Usar FormData para enviar el archivo
-       - Incluir token de autenticación en la cabecera
-       - Manejar respuesta del servidor con URL o ID del documento
-    
-    3. ELIMINACIÓN DE ARCHIVOS:
-       - Reemplazar documentManager.deleteDocument() con una llamada a la API real
-       - Endpoint recomendado: DELETE /api/documents/{id}
-       - Incluir token de autenticación en la cabecera
-    
-    4. IMPRESIÓN:
-       - Reemplazar la simulación con una llamada a la API real
-       - Endpoint recomendado: POST /api/print/{documentId}
-       - Incluir token de autenticación en la cabecera
-       - El backend debería manejar la cola de impresión y notificaciones
-    
-    5. SEGURIDAD:
-       - Validar todos los inputs en el backend
-       - Sanitizar nombres de archivo
-       - Verificar tipos MIME reales, no solo extensiones
-       - Implementar límites de tamaño por usuario/rol
-       - Usar HTTPS en producción
-    
-    6. PERSISTENCIA:
-       - Reemplazar localStorage con llamadas a la API para cargar documentos
-       - Endpoint recomendado: GET /api/documents
-       - Implementar paginación si hay muchos documentos
-    -->
-
-    <!-- Casos de prueba / Criterios de aceptación -->
-    <!-- 
-    CASOS DE PRUEBA MANUALES:
-    
-    1. INICIO DE SESIÓN:
-       - Al cargar la página, debe mostrarse la pestaña "Inicio de sesión"
-       - Introducir cualquier usuario y contraseña debe iniciar sesión correctamente
-       - Debe mostrarse un mensaje de bienvenida
-       - Debe cambiar a la pestaña "Impresión" automáticamente
-       - Debe mostrarse el nombre de usuario en el sidebar
-    
-    2. SUBIDA DE ARCHIVOS:
-       - Arrastrar y soltar un archivo válido debe agregarlo a la lista
-       - Hacer clic en "Seleccionar archivos" y elegir un archivo válido debe agregarlo
-       - Intentar subir un archivo con tipo no permitido debe mostrar error
-       - Intentar subir un archivo mayor a 10MB debe mostrar error
-    
-    3. ELIMINACIÓN DE ARCHIVOS:
-       - Hacer clic en "Eliminar" debe mostrar un modal de confirmación
-       - Confirmar la eliminación debe quitar el documento de la lista
-       - Cancelar la eliminación debe mantener el documento en la lista
-    
-    4. IMPRESIÓN:
-       - Hacer clic en "Imprimir" debe abrir el modal de vista previa
-       - Confirmar la impresión debe simular la impresión y marcar el documento como impreso
-       - El documento impreso debe mostrar el indicador "✓ Impreso"
-    
-    5. CIERRE DE SESIÓN:
-       - Hacer clic en "Cerrar sesión" debe volver a la pestaña de inicio de sesión
-       - Los botones de impresión deben estar deshabilitados y mostrar tooltip
-       - La información de usuario debe ocultarse
-    
-    6. RESPONSIVE:
-       - En pantallas móviles (<768px), el sidebar debe estar oculto inicialmente
-       - El botón de menú móvil debe mostrar/ocultar el sidebar
-       - Al cambiar de pestaña en móvil, el sidebar debe ocultarse automáticamente
-       - Los botones y formularios deben ser accesibles en pantallas pequeñas
-    -->
 </body>
 </html>
